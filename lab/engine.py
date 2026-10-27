@@ -56,12 +56,15 @@ def run_stops(sym, df, cost, entries, stop_fn, trail_fn=None, max_bars=None, exi
     """Simulador genérico, una posición a la vez por símbolo.
 
     entries:  array con +1 / -1 donde la señal aparece al CIERRE de esa vela.
+    cost:     coste de ida y vuelta en precio; un número o un array por vela (se usa el de la vela de entrada).
     stop_fn(i, d, entry) -> distancia inicial al stop (en precio).
     trail_fn(k, d, stop) -> nuevo stop tras el cierre de la vela k (opcional, stops que siguen al precio).
     exit_fn(k, d) -> True para cerrar a la apertura de la vela k (opcional, p. ej. cierre horario).
     max_bars: cierre al cierre de la vela tras N velas (opcional).
     financing: coste anual de mantener la posición abierta (swap), en fracción del precio, por noche (opcional).
+               Un número (igual en los dos sentidos) o una pareja (compras, ventas); negativo = se cobra.
     """
+    fin_long, fin_short = financing if isinstance(financing, (tuple, list)) else (financing, financing)
     o, h, l, c = (df[k].to_numpy() for k in ("open", "high", "low", "close"))
     t, n = df.index, len(df)
     trades, i = [], 0
@@ -93,7 +96,9 @@ def run_stops(sym, df, cost, entries, stop_fn, trail_fn=None, max_bars=None, exi
             k += 1
         if exit_px is None:
             exit_px, k = c[n - 1], n - 1
-        nights = (t[k] - t[j]).days if financing else 0
-        trades.append(make_trade(sym, t[j], t[k], d, entry, exit_px, dist, cost + entry * financing * nights / 365))
+        fin = fin_long if d > 0 else fin_short
+        nights = (t[k] - t[j]).days if fin else 0
+        cst = float(cost[j]) if np.ndim(cost) else cost
+        trades.append(make_trade(sym, t[j], t[k], d, entry, exit_px, dist, cst + entry * fin * nights / 365))
         i = k   # la señal de la vela de salida ya puede abrir la siguiente
     return trades
