@@ -1,0 +1,18 @@
+# Credenciales: nunca a git
+.env
+
+# Tus estrategias, robots y ajustes privados
+private/
+*.mq5
+*.ex5
+*.set
+!examples/*.mq5
+
+# Datos descargados e informes (pueden revelar qué operas)
+data/
+results/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
