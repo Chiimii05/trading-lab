@@ -33,7 +33,8 @@ def _style(ax):
 
 
 def _money(v):
-    return f"{v:,.0f} €".replace(",", ".") if isinstance(v, (int, float)) else html.escape(str(v))
+    sym = {"EUR": "€", "USD": "$", "GBP": "£"}.get(settings.currency, settings.currency)
+    return f"{v:,.0f} {sym}".replace(",", ".") if isinstance(v, (int, float)) else html.escape(str(v))
 
 
 def _table(df, money_cols=(), color_cols=()):
@@ -61,7 +62,7 @@ def equity_chart(strategy_tr, portfolio_tr, start, end):
     if len(strategy_tr) > 1:
         ax.plot(an.daily(portfolio_tr, start, end).cumsum(), label="Portfolio", color="#111", lw=2.4)
     ax.axhline(0, color="#999", lw=0.8)
-    ax.set_ylabel("Beneficio acumulado (€)")
+    ax.set_ylabel(f"Beneficio acumulado ({settings.currency})")
     ax.legend(frameon=False, ncol=3, fontsize=9)
     _style(ax)
     return _img(fig)
@@ -71,7 +72,7 @@ def instrument_chart(inst):
     fig, ax = plt.subplots(figsize=(10, 3.2))
     ax.bar(inst.index, inst.beneficio, color=["#1a7f37" if v >= 0 else "#cf222e" for v in inst.beneficio])
     ax.axhline(0, color="#999", lw=0.8)
-    ax.set_ylabel("Beneficio (€)")
+    ax.set_ylabel(f"Beneficio ({settings.currency})")
     _style(ax)
     return _img(fig)
 

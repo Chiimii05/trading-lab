@@ -27,6 +27,9 @@ class Settings:
     server_us_dst: bool = os.getenv("SERVER_US_DST", "true").lower() == "true"
     # Comisión de ida y vuelta por lote, en la divisa de la cuenta
     commission_per_lot: float = float(os.getenv("COMMISSION_PER_LOT", "5"))
+    # Spread mínimo supuesto (puntos): algunos brokers guardan 0 en el historial aunque el real no lo sea
+    min_spread_points: float = float(os.getenv("MIN_SPREAD_POINTS", "2"))
+    currency: str = os.getenv("CURRENCY", "USD")
     capital: float = float(os.getenv("CAPITAL", "10000"))
     risk_pct: float = float(os.getenv("RISK_PCT", "0.5"))
 

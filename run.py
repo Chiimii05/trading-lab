@@ -73,8 +73,9 @@ def cmd_test(a):
     mode = (f"Walk-forward (optimiza {a.is_months} meses, opera {a.step_months})" if a.mode == "wf" and py_files
             else "Backtest con parámetros fijos")
     notes = [
-        f"Cada operación arriesga el {settings.risk_pct} % de {settings.capital:,.0f} € hasta su stop, sin interés compuesto.".replace(",", "."),
-        "Costes: spread mediano del historial + comisión de " f"{settings.commission_per_lot} por lote ida y vuelta. Sin swaps.",
+        f"Cada operación arriesga el {settings.risk_pct} % de {settings.capital:,.0f} {settings.currency} hasta su stop, sin interés compuesto.".replace(",", "."),
+        "Costes: spread prudente (mayor entre media, percentil 75 y " f"{settings.min_spread_points:g} puntos) + comisión de "
+        f"{settings.commission_per_lot:g} {settings.currency} por lote ida y vuelta. Sin swaps.",
         "Las señales usan solo velas cerradas; la entrada es a la apertura de la vela siguiente.",
         "Si una vela toca el stop y el objetivo a la vez, se supone el stop (criterio prudente).",
         "La caída máxima se calcula con el beneficio realizado al cierre de cada día.",

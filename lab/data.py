@@ -86,8 +86,13 @@ def load(sym):
 
 
 def round_trip_cost(df, meta):
-    """Coste de ida y vuelta en unidades de precio: spread mediano + comisión por lote convertida a precio."""
-    spread = float(df.spread.median()) * meta["point"]
+    """Coste de ida y vuelta en precio: spread prudente + comisión por lote convertida a precio.
+
+    MT5 guarda en cada vela el spread mínimo del periodo, que en cuentas de spread bajo suele ser 0;
+    por eso se toma el mayor entre la media, el percentil 75 y MIN_SPREAD_POINTS.
+    """
+    pts = max(float(df.spread.mean()), float(df.spread.quantile(0.75)), settings.min_spread_points)
+    spread = pts * meta["point"]
     per_price_unit = meta["tick_value"] / meta["tick_size"]   # dinero por 1 unidad de precio y lote
     commission = settings.commission_per_lot / per_price_unit if per_price_unit > 0 else 0.0
     return spread + commission
